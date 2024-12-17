@@ -3,7 +3,9 @@ from django.test import TestCase
 
 from task_manager.models import Task
 from task_manager.tests.utils import (
-	create_task, create_task_type,
+	create_task,
+	create_task_type,
+	create_worker,
 	get_actual_deadline,
 	get_str_over_length_limit,
 	get_past_deadline,
@@ -67,3 +69,19 @@ class TaskModelTest(TestCase):
 
 		self.assertTrue(Task.objects.get(pk=task.pk))
 		self.assertFalse(task.is_completed)
+
+	def test_task_type_is_required(self) -> None:
+		with self.assertRaises(ValidationError):
+			Task.objects.create(
+				name="test-name",
+				description="description",
+				deadline=get_actual_deadline(),
+				priority=1,
+			)
+
+	def test_task_type_sets_null_on_delete(self) -> None:
+		self.task_type.delete()
+		self.task.refresh_from_db()
+
+		self.assertTrue(Task.objects.get(pk=self.task.pk))
+		self.assertIsNone(self.task.task_type)
