@@ -1,3 +1,5 @@
+import datetime
+
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
@@ -91,3 +93,23 @@ class TaskModelTest(TestCase):
 		self.task.assignees.add(user)
 
 		self.assertIn(user, self.task.assignees.all())
+
+	def test_task_ordering(self) -> None:
+		task1 = create_task(
+			name="Task 1",
+			priority=1,
+			deadline=datetime.date(2030, 12, 30)
+		)
+		task2 = create_task(
+			name="Task 2",
+			priority=3,
+			deadline=datetime.date(2030, 12, 20)
+		)
+		task3 = create_task(
+			name="Task 3",
+			priority=3,
+			deadline=datetime.date(2030, 12, 10)
+		)
+		tasks = Task.objects.filter(pk__in=(task1.pk, task2.pk, task3.pk))
+
+		self.assertEqual(list(tasks), [task3, task2, task1])
