@@ -1,6 +1,9 @@
+from django.contrib.admin import site
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 from django.urls import reverse
+
+from task_manager.admin import WorkerAdmin
 
 
 class WorkerAdminPageTest(TestCase):
@@ -32,3 +35,20 @@ class WorkerAdminPageTest(TestCase):
 		self.assertContains(response, "position")
 		self.assertContains(response, "first_name")
 		self.assertContains(response, "last_name")
+
+
+class WorkerAdminConfigTest(SimpleTestCase):
+	def setUp(self) -> None:
+		self.admin_instance = WorkerAdmin(get_user_model(), site)
+
+	def test_list_editable_include_position(self) -> None:
+		self.assertEqual(self.admin_instance.list_editable, ["position"])
+
+	def test_list_filter_include_position(self) -> None:
+		self.assertEqual(self.admin_instance.list_filter, ("position",))
+
+	def test_search_fields_are_correct(self) -> None:
+		self.assertEqual(
+			self.admin_instance.search_fields,
+			("username", "first_name", "last_name")
+		)
