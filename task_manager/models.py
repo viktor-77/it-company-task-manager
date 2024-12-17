@@ -1,5 +1,7 @@
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.timezone import now
 
 
 class TaskType(models.Model):
@@ -71,3 +73,15 @@ class Task(models.Model):
 
 	class Meta:
 		ordering = ["-priority", "deadline"]
+
+	def clean(self):
+		if self.pk and Task.objects.get(pk=self.pk).deadline == self.deadline:
+			return
+		if not self.deadline or self.deadline < now().date():
+			raise ValidationError(
+				{"deadline": self.DEADLINE_ERROR_MESSAGE}
+			)
+
+	def save(self, *args, **kwargs):
+		self.full_clean()
+		super().save(*args, **kwargs)
