@@ -1,7 +1,12 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from task_manager.models import Task, Worker
+from task_manager.models import (
+	Position,
+	Task,
+	TaskType,
+	Worker,
+)
 
 
 @admin.register(Worker)
@@ -55,3 +60,7 @@ class TaskAdmin(admin.ModelAdmin):
 	)
 	search_fields = ("name",)
 	filter_horizontal = ("assignees",)
+
+
+admin.site.register(Position)
+admin.site.register(TaskType)
