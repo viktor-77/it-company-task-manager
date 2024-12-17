@@ -85,3 +85,9 @@ class TaskModelTest(TestCase):
 
 		self.assertTrue(Task.objects.get(pk=self.task.pk))
 		self.assertIsNone(self.task.task_type)
+
+	def test_task_assignees_adding(self) -> None:
+		user = create_worker()
+		self.task.assignees.add(user)
+
+		self.assertIn(user, self.task.assignees.all())
