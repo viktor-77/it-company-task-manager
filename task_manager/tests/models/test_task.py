@@ -1,9 +1,11 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
+from task_manager.models import Task
 from task_manager.tests.utils import (
 	create_task, create_task_type,
 	get_str_over_length_limit,
+	get_past_deadline,
 )
 
 
@@ -34,3 +36,21 @@ class TaskModelTest(TestCase):
 
 		with self.assertRaises(ValidationError):
 			test_task.save()
+
+	def test_deadline_validation_on_create(self) -> None:
+		with self.assertRaises(ValidationError) as context:
+			create_task(deadline=get_past_deadline())
+
+		self.assertRaisesMessage(
+			context, Task.DEADLINE_ERROR_MESSAGE
+		)
+
+	def test_deadline_validation_on_update(self) -> None:
+		self.task.deadline = get_past_deadline()
+
+		with self.assertRaises(ValidationError) as context:
+			self.task.save()
+
+		self.assertRaisesMessage(
+			context, Task.DEADLINE_ERROR_MESSAGE
+		)
