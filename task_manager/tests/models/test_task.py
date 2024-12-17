@@ -113,3 +113,6 @@ class TaskModelTest(TestCase):
 		tasks = Task.objects.filter(pk__in=(task1.pk, task2.pk, task3.pk))
 
 		self.assertEqual(list(tasks), [task3, task2, task1])
+
+	def test_str_method(self) -> None:
+		self.assertEqual(str(self.task), self.task.name)
