@@ -4,6 +4,7 @@ from django.test import TestCase
 from task_manager.models import Task
 from task_manager.tests.utils import (
 	create_task, create_task_type,
+	get_actual_deadline,
 	get_str_over_length_limit,
 	get_past_deadline,
 )
@@ -54,3 +55,15 @@ class TaskModelTest(TestCase):
 		self.assertRaisesMessage(
 			context, Task.DEADLINE_ERROR_MESSAGE
 		)
+
+	def test_is_completed_field_set_false_by_default(self) -> None:
+		task = Task.objects.create(
+			name="test-name",
+			description="description",
+			deadline=get_actual_deadline(),
+			priority=1,
+			task_type=self.task_type,
+		)
+
+		self.assertTrue(Task.objects.get(pk=task.pk))
+		self.assertFalse(task.is_completed)
