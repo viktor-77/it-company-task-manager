@@ -68,3 +68,6 @@ class Task(models.Model):
 		related_name="tasks"
 	)
 	assignees = models.ManyToManyField(Worker, related_name="tasks")
+
+	class Meta:
+		ordering = ["-priority", "deadline"]
