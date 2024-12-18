@@ -15,7 +15,7 @@
 				<p class="mb-4">
 					{% block error_message %}Sorry... Something went wrong{% endblock error_message %}
 				</p>
-				<a href="/"
+				<a href="{% url "task_manager:index" %}"
 					 class="btn bg-gradient-primary mt-3 mb-0 w-85 m-auto">HOME
 				</a>
 			</div>
