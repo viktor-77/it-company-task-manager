@@ -1,0 +1,210 @@
+{% extends 'layouts/base_sections.html' %}
+{% load static %}
+{% block body %} class="index-page bg-gray-200" {% endblock body %}
+
+{% block content %}
+	<header class="header-2">
+		<div
+			class="page-header min-vh-55 relative"
+			style="background-image: url('{% static 'img/curved-images/curved.jpg' %}')">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-7 text-center mx-auto">
+						<h1 class="text-white pt-3 mt-n5">Task Manager System</h1>
+						<p class="lead text-white mt-3">Free & Open Source Web Task Manager
+							System
+						</p>
+					</div>
+				</div>
+			</div>
+			{% include "includes/svg_waves.html" %}
+		</div>
+	</header>
+
+	<section class="py-5 bg-gradient-light">
+		<div class="container">
+			<div class="row text-center">
+
+				<!-- Total Tasks -->
+				<div class="col-lg-4 col-md-6 mb-4">
+					<div
+						class="card border-0 shadow tilt"
+						data-tilt="">
+						<div class="card-body py-5">
+							<div class="icon-lg bg-gradient-primary text-white rounded-circle mb-3 mx-auto">
+								<i class="fas fa-tasks fa-2x"></i>
+							</div>
+							<h5 class="card-title font-weight-bold">Total Tasks</h5>
+							<p
+								class="display-4 text-primary"
+								id="state1"
+								countTo="{{ total_tasks }}">{{ total_tasks }}</p>
+							<p class="text-muted">All tasks in the system</p>
+						</div>
+					</div>
+				</div>
+
+				<!-- Active Tasks -->
+				<div class="col-lg-4 col-md-6 mb-4">
+					<div
+						class="card border-0 shadow tilt"
+						data-tilt="">
+						<div class="card-body py-5">
+							<div class="icon-lg bg-gradient-success text-white rounded-circle mb-3 mx-auto">
+								<i class="fas fa-spinner fa-2x"></i>
+							</div>
+							<h5 class="card-title font-weight-bold">Active Tasks</h5>
+							<p
+								class="display-4 text-success"
+								id="state2"
+								countTo="{{ active_tasks }}">{{ active_tasks }}</p>
+							<p class="text-muted">Tasks currently in progress</p>
+						</div>
+					</div>
+				</div>
+
+				<!-- Total Users -->
+				<div class="col-lg-4 col-md-6 mb-4">
+					<div
+						class="card border-0 shadow tilt"
+						data-tilt="">
+						<div class="card-body py-5">
+							<div class="icon-lg bg-gradient-warning text-white rounded-circle mb-3 mx-auto">
+								<i class="fas fa-users fa-2x"></i>
+							</div>
+							<h5 class="card-title font-weight-bold">Total Users</h5>
+							<p
+								class="display-4 text-warning"
+								id="state3"
+								countTo="{{ total_users }}">{{ total_users }}</p>
+							<p class="text-muted">Registered users in the system</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="py-5">
+		<div class="container">
+			<div class="row text-center">
+				<div class="col-lg-8 mx-auto">
+					<h2 class="font-weight-bold">About Task Manager System</h2>
+					<p class="text-muted mt-3">
+						This system helps teams efficiently manage tasks by assigning,
+						tracking, and completing tasks in one centralized platform. Perfect
+						for developers, designers, and project managers.
+					</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="py-5 bg-light">
+		<div class="container">
+			<div class="row text-center g-6">
+				<div class="col-md-4">
+					<div class="icon-lg bg-gradient-primary text-white rounded-circle mb-3 mx-auto">
+						<i class="fas fa-user-plus fa-2x"></i>
+					</div>
+					<h5 class="font-weight-bold">User Management</h5>
+					<p class="text-muted">Easily manage users, roles, and
+						permissions.
+					</p>
+				</div>
+				<div class="col-md-4 shadow card bg-transparent">
+					<div class="icon-lg bg-gradient-info text-white rounded-circle mb-3 mx-auto">
+						<i class="fas fa-chart-line fa-2x"></i>
+					</div>
+					<h5 class="font-weight-bold">Task Tracking</h5>
+					<p class="text-muted">Monitor task progress in real time.</p>
+				</div>
+				<div class="col-md-4">
+					<div class="icon-lg bg-gradient-faded-danger text-white rounded-circle mb-3 mx-auto">
+						<i class="fas fa-clock fa-2x"></i>
+					</div>
+					<h5 class="font-weight-bold">Deadline Management</h5>
+					<p class="text-muted">Stay on schedule and never miss a deadline.</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="py-5 bg-light mt-5 mb-7">
+		<div class="container">
+			<div class="row text-center">
+
+				<!-- Workers -->
+				<div class="col-md-6 mb-4">
+					<div class="card border-0 shadow-lg h-100">
+						<div class="card-body d-flex flex-column justify-content-center align-items-center">
+							<div class="icon-lg bg-primary text-white rounded-circle mb-3">
+								<i class="fas fa-users fa-3x"></i>
+							</div>
+							<h4 class="card-title font-weight-bold">Our Workers</h4>
+							<p class="card-text text-muted">
+								Explore the list of all registered workers and their assigned
+								tasks.
+							</p>
+							<a
+								href="#"
+								class="btn btn-primary btn-lg mt-3">
+								View Workers
+							</a>
+						</div>
+					</div>
+				</div>
+
+				<!-- Tasks -->
+				<div class="col-md-6 mb-4">
+					<div class="card border-0 shadow-lg h-100">
+						<div class="card-body d-flex flex-column justify-content-center align-items-center">
+							<div class="icon-lg bg-success text-white rounded-circle mb-3">
+								<i class="fas fa-tasks fa-3x"></i>
+							</div>
+							<h4 class="card-title font-weight-bold">Manage Tasks</h4>
+							<p class="card-text text-muted">
+								Stay updated with all tasks, filter them, or add a new one.
+							</p>
+							<a
+								href="#"
+								class="btn btn-success btn-lg mt-3">
+								View Tasks
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+{% endblock content %}
+
+{% block javascripts %}
+	<script type="text/javascript">
+      if (document.getElementById('state1')) {
+          const countUp = new CountUp('state1', document.getElementById("state1").getAttribute("countTo"));
+          if (!countUp.error) {
+              countUp.start();
+          } else {
+              console.error(countUp.error);
+          }
+      }
+      if (document.getElementById('state2')) {
+          const countUp1 = new CountUp('state2', document.getElementById("state2").getAttribute("countTo"));
+          if (!countUp1.error) {
+              countUp1.start();
+          } else {
+              console.error(countUp1.error);
+          }
+      }
+      if (document.getElementById('state3')) {
+          const countUp2 = new CountUp('state3', document.getElementById("state3").getAttribute("countTo"));
+          if (!countUp2.error) {
+              countUp2.start();
+          } else {
+              console.error(countUp2.error);
+          }
+          ;
+      }
+	</script>
+{% endblock javascripts %}
