@@ -1,0 +1,24 @@
+{% extends 'layouts/base_sections.html' %}
+{% load static %}
+{% block body %} class="index-page bg-gray-200 vh-100 d-flex flex-column" {% endblock body %}
+
+{% block content %}
+	<header class="flex-grow-1 d-flex align-items-center justify-content-center position-relative">
+		<img class="position-absolute top-0 end-0 w-50 h-100 z-index-0 d-none d-md-block border-radius-section border-top-end-radius-0 border-top-start-radius-0 border-bottom-end-radius-0"
+				 src="https://appsrv1-147a1.kxcdn.com/soft-ui-design-v1.0.1/img/curved-images/curved8.jpg"
+				 alt="Background Image">
+		<div class="container text-center position-absolute z-index-1 mt-12">
+			<div class="card d-flex blur justify-content-center p-4 shadow-lg w-50 m-auto">
+				<h3 class="text-gradient text-primary">
+					Error {% block error_code %}{% endblock error_code %}
+				</h3>
+				<p class="mb-4">
+					{% block error_message %}Sorry... Something went wrong{% endblock error_message %}
+				</p>
+				<a href="/"
+					 class="btn bg-gradient-primary mt-3 mb-0 w-85 m-auto">HOME
+				</a>
+			</div>
+		</div>
+	</header>
+{% endblock content %}
