@@ -1,7 +1,8 @@
+from django.contrib.auth.views import LoginView as BaseLoginView
 from django.contrib.auth import get_user_model
 from django.db.models import Count, Q
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 
 from task_manager.models import Task
 
@@ -21,3 +22,11 @@ def index(request: HttpRequest) -> HttpResponse:
 			"total_users": get_user_model().objects.count(),
 		}
 	)
+
+
+class LoginView(BaseLoginView):
+	def dispatch(self, request, *args, **kwargs):
+		if request.user.is_authenticated:
+			return redirect("task_manager:index")
+
+		return super().dispatch(request, *args, **kwargs)
