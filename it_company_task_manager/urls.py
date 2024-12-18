@@ -19,9 +19,13 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
+from task_manager.views import LoginView
+
 urlpatterns = [
 	path("admin/", admin.site.urls),
 	path("", include("task_manager.urls", "task_manager")),
+	path("accounts/login/", LoginView.as_view(), name="login"),
+
 	path("accounts/", include("django.contrib.auth.urls")),
 ]
 
