@@ -1,0 +1,153 @@
+{% load static %}
+
+<div class="container position-sticky z-index-sticky top-0">
+	<div class="row">
+		<div class="col-12">
+			<nav
+				class="navbar navbar-expand-lg blur blur-rounded top-0 z-index-fixed shadow position-absolute my-3 py-2 start-0 end-0 mx-4">
+				<div class="container-fluid px-0">
+					<a
+						class="navbar-brand font-weight-bolder ms-sm-2 mb-0 bg-gradient-primary btn btn-rounded"
+						href="/"
+						rel="tooltip"> Task Manager
+					</a>
+
+					<button
+						class="navbar-toggler shadow-none ms-2"
+						type="button"
+						data-bs-toggle="collapse"
+						data-bs-target="#navigation"
+						aria-controls="navigation"
+						aria-expanded="false"
+						aria-label="Toggle navigation">
+						<span class="navbar-toggler-icon mt-2">
+							<span class="navbar-toggler-bar bar1"></span>
+							<span class="navbar-toggler-bar bar2"></span>
+							<span class="navbar-toggler-bar bar3"></span>
+						</span>
+					</button>
+					<div
+						class="collapse navbar-collapse pt-3 pb-2 py-lg-0 w-100"
+						id="navigation">
+						<ul class="navbar-nav navbar-nav-hover ms-lg-12 ps-lg-5 w-100">
+
+							<!-- Users List Icon -->
+							<li class="nav-item">
+								<a
+									class="nav-link nav-link-icon"
+									href="#"
+									data-bs-toggle="tooltip"
+									data-bs-placement="bottom"
+									title="Workers list">
+									<span class="text-gradient text-primary">
+										<i class="fas fa-user-friends me-1 fa-lg"></i>
+									</span>
+									<span class="text-sm">Workers</span>
+								</a>
+							</li>
+
+							<!-- Task Dropdown -->
+							<li class="nav-item dropdown dropdown-hover mx-2">
+								<div
+									class="nav-link ps-2 d-flex align-items-center cursor-pointer"
+									id="dropdownMenuBlocks"
+									data-bs-toggle="dropdown"
+									title="Task options">
+									<span class="text-gradient text-primary">
+										<i class="fas fa-tasks fa-lg me-2"></i>
+									</span>
+									Task <img
+									src="{% static 'img/down-arrow-white.svg' %}"
+									alt="down-arrow"
+									class="arrow ms-1"/></div>
+								<ul
+									class="dropdown-menu p-3 border-radius-lg mt-0 mt-lg-3 overflow-hidden"
+									aria-labelledby="dropdownMenuBlocks">
+									<li class="dropdown-subitem">
+										<a
+											class="dropdown-item py-2 ps-3 border-radius-md"
+											href="#">
+											<div class="d-flex align-items-center">
+												<div class="icon h-10 me-3 d-flex">
+													<i
+														class="ni ni-single-copy-04 text-gradient text-primary"></i>
+												</div>
+												<div
+													class="w-100 d-flex align-items-center justify-content-between">
+													<p class="text-dark p-0 m-0">
+														List
+													</p>
+												</div>
+											</div>
+										</a>
+									</li>
+									<li class="dropdown-subitem">
+										<a
+											class="dropdown-item py-2 ps-3 border-radius-md"
+											href="#">
+											<div class="d-flex align-items-center">
+												<div class="icon h-10 me-3 d-flex">
+													<i
+														class="ni ni-badge text-gradient text-primary"></i>
+												</div>
+												<div
+													class="w-100 d-flex align-items-center justify-content-between">
+													<p class="text-dark p-0 m-0">
+														Create
+													</p>
+												</div>
+											</div>
+										</a>
+									</li>
+								</ul>
+							</li>
+
+							{% if request.user.is_authenticated %}
+								<!-- User Detail Icon -->
+								<li class="nav-item ms-lg-auto">
+									<a class="nav-link nav-link-icon"
+										 href="#"
+										 data-bs-toggle="tooltip"
+										 data-bs-placement="bottom"
+										 title="My page">
+										<span class="text-gradient text-primary">
+											<i class="far fa-user fa-lg"></i>
+										</span>
+									</a>
+								</li>
+								<!-- Logout Button -->
+								<li class="nav-item ms-2 d-flex align-items-center">
+									<form action="#"
+												method="post">
+										{% csrf_token %}
+										<button class="bg-transparent border-0 p-lg-1"
+														data-bs-toggle="tooltip"
+														data-bs-placement="bottom"
+														title="Logout">
+											<span class="text-gradient text-primary">
+												<i class="fa fa-sign-out"></i>
+											</span>
+										</button>
+									</form>
+								</li>
+							{% else %}
+								<!-- Login Button -->
+								<li class="nav-item ms-lg-auto ms-lg-2">
+									<a class="nav-link nav-link-icon"
+										 href="#"
+										 data-bs-toggle="tooltip"
+										 data-bs-placement="bottom"
+										 title="Login">
+										<span class="text-gradient text-primary">
+											<i class="fa fa-sign-in fa-lg"></i>
+										</span>
+									</a>
+								</li>
+							{% endif %}
+						</ul>
+					</div>
+				</div>
+			</nav>
+		</div>
+	</div>
+</div>
