@@ -10,7 +10,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import DeleteView, DetailView, ListView
 
-from task_manager.mixins import PreviousPageMixin
+from task_manager.mixins import PreviousPageMixin, SearchMixin
 from task_manager.models import Task
 
 
@@ -39,7 +39,7 @@ class LoginView(BaseLoginView):
 		return super().dispatch(request, *args, **kwargs)
 
 
-class WorkerListView(ListView):
+class WorkerListView(SearchMixin, ListView):
 	model = get_user_model()
 	context_object_name = "worker_list"
 	template_name = "pages/worker_list.html"
