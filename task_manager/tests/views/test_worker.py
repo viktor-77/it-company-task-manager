@@ -76,6 +76,18 @@ class WorkerListViewTest(TestCase):
 			len(response.context["worker_list"]), 2
 		)
 
+	def test_worker_list_view_search_form_in_context(self) -> None:
+		response = self.client.get(
+			reverse(WORKER_LIST_URL) + f"?query={self.worker1.username}"
+		)
+
+		self.assertEqual(response.status_code, 200)
+		self.assertIn("search_form", response.context)
+		self.assertEqual(
+			response.context["search_form"].initial["query"],
+			self.worker1.username
+		)
+
 
 class WorkerDetailViewTest(TestCase):
 	@classmethod
