@@ -106,7 +106,7 @@
 								<!-- User Detail Icon -->
 								<li class="nav-item ms-lg-auto">
 									<a class="nav-link nav-link-icon"
-										 href="#"
+										 href="{% url "task_manager:worker_detail" request.user.pk %}"
 										 data-bs-toggle="tooltip"
 										 data-bs-placement="bottom"
 										 title="My page">
