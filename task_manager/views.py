@@ -101,3 +101,25 @@ class WorkerDeleteView(PreviousPageMixin, DeleteView):
 			)
 
 		return super().dispatch(request, *args, **kwargs)
+
+
+class TaskListView(SearchMixin, ListView):
+	model = Task
+	context_object_name = "task_list"
+	template_name = "pages/task_list.html"
+	paginate_by = 10
+
+	def get_queryset(self):
+		queryset = Task.objects.select_related("task_type")
+		search_query = str(self.request.GET.get("query", "")).strip()
+
+		if search_query:
+			queryset = queryset.filter(name__icontains=search_query)
+
+		return queryset
+
+	def get_context_data(self, **kwargs) -> dict:
+		context = super().get_context_data(**kwargs)
+		context["today"] = date.today()
+
+		return context
