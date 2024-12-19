@@ -1,0 +1,114 @@
+{% extends 'layouts/base_sections.html' %}{% load static %}
+{% block body %} class="index-page bg-gray-200" {% endblock body %}
+
+{% block content %}
+
+	<main class="header-2">
+		<div
+			class="page-header min-vh-100 relative"
+			style="background-image: url('{% static 'img/curved-images/curved.jpg' %}')">
+			<div class="container my-3">
+
+				<!-- Search -->
+				{% include "includes/search.html" %}
+
+				<!-- Table -->
+				<div class="table-responsive shadow">
+					<table
+						class="table table-striped table-hover align-middle bg-white
+						text-center rounded-3 overflow-hidden">
+						<thead class="bg-gradient-primary text-white">
+							<tr>
+								<th
+									scope="col"
+									class="fw-bold text-uppercase">Name
+								</th>
+								<th
+									scope="col"
+									class="fw-bold text-uppercase">Created At
+								</th>
+								<th
+									scope="col"
+									class="fw-bold text-uppercase">Deadline
+								</th>
+								<th
+									scope="col"
+									class="fw-bold text-uppercase">Status
+								</th>
+								<th
+									scope="col"
+									class="fw-bold text-uppercase">Priority
+								</th>
+								<th
+									scope="col"
+									class="fw-bold text-uppercase">Task Type
+								</th>
+								{% if request.user.position == "Manager" or user.is_superuser %}
+									<th
+										scope="col"
+										class="fw-bold text-uppercase">
+									Edit
+									</th>
+									<th
+										scope="col"
+										class="fw-bold text-uppercase">Delete
+									</th>
+								{% endif %}
+							</tr>
+						</thead>
+						<tbody>
+							{% for task in task_list %}
+								<tr>
+									<td>
+										<a
+											href="#"
+											class="text-info fw-bold">
+											{{ task }}
+										</a>
+									</td>
+									<td><i>{{ task.created_at }}</i></td>
+									<td {% include "includes/deadline_overdue_indicator.html" %}>
+										<i>{{ task.deadline }}</i>
+									</td>
+									<td>
+										{% include "includes/task_status_indicator.html" %}
+									</td>
+									<td>
+										{% include "includes/task_priority_indicator.html" %}
+									</td>
+									<td>{{ task.task_type }}</td>
+									{% if request.user.position == "Manager" or user.is_superuser %}
+										<td>
+											<a href="#"
+												 class="text-info text-gradient">
+												<i
+													class="fas fa-edit me-2"
+													aria-hidden="true"></i>
+											</a>
+										</td>
+										<td>
+											<a href="#"
+												 class="text-danger text-gradient">
+												<i class="fas fa-trash me-2"
+													 aria-hidden="true"></i>
+											</a>
+										</td>
+									{% endif %}
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+
+					<!-- Pagination -->
+					{% include "includes/pagination.html" %}
+				</div>
+			</div>
+
+			<!-- Waves effect block -->
+			{% if not is_paginated or page_obj.object_list.count < paginator.per_page %}
+				{% include "includes/svg_waves.html" %}
+			{% endif %}
+
+		</div>
+	</main>
+{% endblock content %}
