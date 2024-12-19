@@ -1,0 +1,8 @@
+{% if task.is_completed %}
+	<span class="text-gradient text-success fw-bold">Resolved
+		<i class="fas fa-check-circle"></i></span>
+{% else %}
+	<span class="text-info  fw-bold">In
+		progress <i class="fas fa-spinner"></i>
+	</span>
+{% endif %}
