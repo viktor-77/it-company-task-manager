@@ -1,6 +1,7 @@
 from datetime import date
 
 from django.conf.global_settings import LOGIN_URL
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
@@ -10,6 +11,7 @@ from task_manager.tests.utils import (
 
 WORKER_LIST_URL = "task_manager:worker_list"
 WORKER_DETAIL_URL = "task_manager:worker_detail"
+WORKER_DELETE_URL = "task_manager:worker_delete"
 
 
 class WorkerListViewTest(TestCase):
@@ -132,3 +134,49 @@ class WorkerDetailViewTest(TestCase):
 			[self.resolved_task1, self.resolved_task2]
 		)
 		self.assertEqual(response.context["today"], date.today())
+
+
+class WorkerDeleteViewTest(TestCase):
+	@classmethod
+	def setUpTestData(cls) -> None:
+		cls.superuser = create_worker(username="admin", is_superuser=True)
+		cls.user = create_worker(username="user")
+		cls.test_user = create_worker(username="test-user")
+
+	def test_worker_delete_view_not_accessible_for_unauthenticated_users(
+		self
+	):
+		response = self.client.get(
+			reverse(WORKER_DELETE_URL, args=[self.test_user.pk])
+		)
+
+		self.assertEqual(response.status_code, 403)
+
+	def test_worker_delete_view_not_accessible_for_regular_users(self) -> None:
+		self.client.force_login(self.user)
+		response = self.client.get(
+			reverse(WORKER_DELETE_URL, args=[self.test_user.pk])
+		)
+
+		self.assertEqual(response.status_code, 403)
+
+	def test_worker_delete_view_accessible_for_superuser(self) -> None:
+		self.client.force_login(self.superuser)
+		response = self.client.get(
+			reverse(WORKER_DELETE_URL, args=[self.test_user.pk])
+		)
+
+		self.assertEqual(response.status_code, 200)
+		self.assertTemplateUsed(response, "pages/worker_confirm_delete.html")
+		self.assertIn("previous_page", response.context)
+
+	def test_worker_delete_successful_for_superuser(self) -> None:
+		self.client.force_login(self.superuser)
+		response = self.client.post(
+			reverse(WORKER_DELETE_URL, args=[self.test_user.pk])
+		)
+
+		self.assertFalse(
+			get_user_model().objects.filter(pk=self.test_user.pk).exists()
+		)
+		self.assertRedirects(response, reverse(WORKER_LIST_URL))
