@@ -4,10 +4,12 @@ from django.conf.global_settings import LOGIN_URL
 from django.test import TestCase
 from django.urls import reverse
 
+from task_manager.models import Task
 from task_manager.tests.utils import create_task, create_worker
 
 TASK_LIST_URL = "task_manager:task_list"
 TASK_DETAIL_URL = "task_manager:task_detail"
+TASK_DELETE_URL = "task_manager:task_delete"
 
 
 class TaskListViewTest(TestCase):
@@ -129,3 +131,74 @@ class TaskDetailViewTest(TestCase):
 		self.assertEqual(response.status_code, 200)
 		self.assertEqual(response.context["today"], date.today())
 		self.assertFalse(response.context["is_assigned"])
+
+
+class TaskDeleteViewTest(TestCase):
+	@classmethod
+	def setUpTestData(cls) -> None:
+		cls.superuser = create_worker(username="admin", is_superuser=True)
+		cls.unassigned_user = create_worker("user1")
+		cls.assigned_user = create_worker("user2")
+
+	def setUp(self) -> None:
+		self.task = create_task()
+		self.task.assignees.add(self.assigned_user)
+
+	def test_task_delete_view_not_accessible_for_unauthenticated_users(
+		self
+	) -> None:
+		response = self.client.get(
+			reverse(TASK_DELETE_URL, args=[self.task.pk])
+		)
+
+		self.assertEqual(response.status_code, 403)
+
+	def test_task_delete_view_not_accessible_for_unassigned_users(
+		self
+	) -> None:
+		self.client.force_login(self.unassigned_user)
+		response = self.client.get(
+			reverse(TASK_DELETE_URL, args=[self.task.pk])
+		)
+
+		self.assertEqual(response.status_code, 403)
+
+	def test_task_delete_view_accessible_for_assigned_users(self) -> None:
+		self.client.force_login(self.assigned_user)
+		response = self.client.get(
+			reverse(TASK_DELETE_URL, args=[self.task.pk])
+		)
+
+		self.assertEqual(response.status_code, 200)
+		self.assertTemplateUsed(response, "pages/task_confirm_delete.html")
+		self.assertIn("previous_page", response.context)
+
+	def test_task_delete_view_accessible_for_superuser(self) -> None:
+		self.client.force_login(self.superuser)
+		response = self.client.get(
+			reverse(TASK_DELETE_URL, args=[self.task.pk])
+		)
+
+		self.assertEqual(response.status_code, 200)
+		self.assertTemplateUsed(response, "pages/task_confirm_delete.html")
+		self.assertIn("previous_page", response.context)
+
+	def test_task_delete_successful_for_assigned_user(self) -> None:
+		self.client.force_login(self.assigned_user)
+		response = self.client.post(
+			reverse(TASK_DELETE_URL, args=[self.task.pk])
+		)
+
+		self.assertFalse(
+			Task.objects.filter(pk=self.task.pk).exists()
+		)
+		self.assertRedirects(response, reverse(TASK_LIST_URL))
+
+	def test_task_delete_successful_for_superuser(self) -> None:
+		self.client.force_login(self.superuser)
+		response = self.client.post(
+			reverse(TASK_DELETE_URL, args=[self.task.pk])
+		)
+
+		self.assertFalse(Task.objects.filter(pk=self.task.pk).exists())
+		self.assertRedirects(response, reverse(TASK_LIST_URL))
