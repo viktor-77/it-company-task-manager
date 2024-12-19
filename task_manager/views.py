@@ -10,6 +10,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import DeleteView, DetailView, ListView
 
+from task_manager.mixins import PreviousPageMixin
 from task_manager.models import Task
 
 
@@ -88,7 +89,7 @@ class WorkerDetailView(LoginRequiredMixin, DetailView):
 		return context
 
 
-class WorkerDeleteView(DeleteView):
+class WorkerDeleteView(PreviousPageMixin, DeleteView):
 	model = get_user_model()
 	template_name = "pages/worker_confirm_delete.html"
 	success_url = reverse_lazy("task_manager:worker_list")
