@@ -1,9 +1,12 @@
+from datetime import date
+
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView as BaseLoginView
 from django.contrib.auth import get_user_model
-from django.db.models import Count, Q
+from django.db.models import Count, Prefetch, Q
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
-from django.views.generic import ListView
+from django.views.generic import DetailView, ListView
 
 from task_manager.models import Task
 
@@ -51,3 +54,33 @@ class WorkerListView(ListView):
 			)
 
 		return queryset
+
+
+class WorkerDetailView(LoginRequiredMixin, DetailView):
+	model = get_user_model()
+	context_object_name = "worker"
+	template_name = "pages/worker_detail.html"
+
+	queryset = get_user_model().objects.select_related(
+		"position"
+	).prefetch_related(
+		Prefetch(
+			"tasks",
+			queryset=Task.objects.filter(is_completed=False),
+			to_attr="active_tasks"
+		),
+		Prefetch(
+			"tasks",
+			queryset=Task.objects.filter(is_completed=True),
+			to_attr="resolved_tasks"
+		),
+	)
+
+	def get_context_data(self, **kwargs) -> dict:
+		context = super().get_context_data(**kwargs)
+
+		context["active_tasks"] = self.object.active_tasks
+		context["resolved_tasks"] = self.object.resolved_tasks
+		context["today"] = date.today()
+
+		return context
