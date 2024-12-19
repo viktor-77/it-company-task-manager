@@ -1,11 +1,13 @@
 from datetime import date
 
+from django.conf.global_settings import LOGIN_URL
 from django.test import TestCase
 from django.urls import reverse
 
-from task_manager.tests.utils import create_task
+from task_manager.tests.utils import create_task, create_worker
 
 TASK_LIST_URL = "task_manager:task_list"
+TASK_DETAIL_URL = "task_manager:task_detail"
 
 
 class TaskListViewTest(TestCase):
@@ -81,3 +83,49 @@ class TaskListViewTest(TestCase):
 		response = self.client.get(reverse(TASK_LIST_URL))
 
 		self.assertEqual(response.context["today"], date.today())
+
+
+class TaskDetailViewTest(TestCase):
+	@classmethod
+	def setUpTestData(cls) -> None:
+		cls.user = create_worker()
+		cls.unassigned_user = create_worker("unassigned_user")
+		cls.task = create_task()
+		cls.task.assignees.add(cls.user)
+
+	def test_task_detail_view_login_required(self) -> None:
+		response = self.client.get(
+			reverse(TASK_DETAIL_URL, args=[self.task.pk])
+		)
+
+		self.assertEqual(response.status_code, 302)
+		self.assertIn(LOGIN_URL, response.url)
+
+	def test_task_detail_view_accessible_for_authenticated_users(self) -> None:
+		self.client.force_login(self.user)
+		response = self.client.get(
+			reverse(TASK_DETAIL_URL, args=[self.task.pk])
+		)
+
+		self.assertEqual(response.status_code, 200)
+		self.assertTemplateUsed(response, "pages/task_detail.html")
+
+	def test_task_detail_view_context_data(self) -> None:
+		self.client.force_login(self.user)
+		response = self.client.get(
+			reverse(TASK_DETAIL_URL, args=[self.task.pk])
+		)
+
+		self.assertEqual(response.status_code, 200)
+		self.assertEqual(response.context["today"], date.today())
+		self.assertTrue(response.context["is_assigned"])
+
+	def test_task_detail_view_context_data_for_non_assigned_user(self) -> None:
+		self.client.force_login(self.unassigned_user)
+		response = self.client.get(
+			reverse(TASK_DETAIL_URL, args=[self.task.pk])
+		)
+
+		self.assertEqual(response.status_code, 200)
+		self.assertEqual(response.context["today"], date.today())
+		self.assertFalse(response.context["is_assigned"])
