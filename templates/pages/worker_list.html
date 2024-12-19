@@ -52,7 +52,7 @@
 								<tr>
 									<td>
 										<a
-											href="#"
+											href="{% url "task_manager:worker_detail" worker.pk %}"
 											class="text-info fw-bold">
 											{{ worker.username|capfirst }}
 										</a>
