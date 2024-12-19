@@ -123,3 +123,21 @@ class TaskListView(SearchMixin, ListView):
 		context["today"] = date.today()
 
 		return context
+
+
+class TaskDetailView(LoginRequiredMixin, DetailView):
+	model = Task
+	context_object_name = "task"
+	template_name = "pages/task_detail.html"
+	queryset = Task.objects.select_related("task_type").prefetch_related(
+		"assignees"
+	)
+
+	def get_context_data(self, **kwargs) -> dict:
+		context = super().get_context_data(**kwargs)
+		context["today"] = date.today()
+		context["is_assigned"] = self.object.assignees.filter(
+			pk=self.request.user.pk
+		).exists()
+
+		return context
