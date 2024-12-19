@@ -3,10 +3,12 @@ from datetime import date
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView as BaseLoginView
 from django.contrib.auth import get_user_model
+from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Prefetch, Q
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
-from django.views.generic import DetailView, ListView
+from django.urls import reverse_lazy
+from django.views.generic import DeleteView, DetailView, ListView
 
 from task_manager.models import Task
 
@@ -84,3 +86,17 @@ class WorkerDetailView(LoginRequiredMixin, DetailView):
 		context["today"] = date.today()
 
 		return context
+
+
+class WorkerDeleteView(DeleteView):
+	model = get_user_model()
+	template_name = "pages/worker_confirm_delete.html"
+	success_url = reverse_lazy("task_manager:worker_list")
+
+	def dispatch(self, request, *args, **kwargs):
+		if not request.user.is_superuser:
+			raise PermissionDenied(
+				"You are not allowed to delete users."
+			)
+
+		return super().dispatch(request, *args, **kwargs)
