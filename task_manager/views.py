@@ -141,3 +141,20 @@ class TaskDetailView(LoginRequiredMixin, DetailView):
 		).exists()
 
 		return context
+
+
+class TaskDeleteView(PreviousPageMixin, DeleteView):
+	model = Task
+	template_name = "pages/task_confirm_delete.html"
+	success_url = reverse_lazy("task_manager:task_list")
+
+	def dispatch(self, request, *args, **kwargs):
+		task = self.get_object()
+		is_user_assigner = task.assignees.filter(pk=request.user.pk).exists()
+
+		if not (request.user.is_superuser or is_user_assigner):
+			raise PermissionDenied(
+				"You are not allowed to delete this task."
+			)
+
+		return super().dispatch(request, *args, **kwargs)
