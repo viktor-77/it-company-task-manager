@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Count, Q
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
+from django.views.generic import ListView
 
 from task_manager.models import Task
 
@@ -30,3 +31,23 @@ class LoginView(BaseLoginView):
 			return redirect("task_manager:index")
 
 		return super().dispatch(request, *args, **kwargs)
+
+
+class WorkerListView(ListView):
+	model = get_user_model()
+	context_object_name = "worker_list"
+	template_name = "pages/worker_list.html"
+	paginate_by = 10
+
+	def get_queryset(self):
+		queryset = get_user_model().objects.select_related("position")
+		search_query = str(self.request.GET.get("query", "")).strip()
+
+		if search_query:
+			queryset = queryset.filter(
+				Q(username__icontains=search_query) |
+				Q(first_name__icontains=search_query) |
+				Q(last_name__icontains=search_query)
+			)
+
+		return queryset
