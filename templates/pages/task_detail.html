@@ -19,7 +19,7 @@
 						{% if is_assigned or user.is_superuser %}
 							<div class="d-flex gap-3 flex-column align-items-end justify-content-end position-absolute custom-position"
 									 style="right:24px">
-								<a href="#">
+								<a href="{% url "task_manager:task_delete" task.pk %}">
 									<div
 										class="btn bg-gradient-danger btn-icon m-0"
 										type="button">
