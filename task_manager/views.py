@@ -2,7 +2,7 @@ from datetime import date
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView as BaseLoginView
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, login
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Prefetch, Q
 from django.http import HttpRequest, HttpResponse
@@ -16,7 +16,7 @@ from django.views.generic import (
 	DeleteView,
 )
 
-from task_manager.forms import TaskForm
+from task_manager.forms import TaskForm, WorkerCreateForm
 from task_manager.mixins import PreviousPageMixin, SearchMixin
 from task_manager.models import Task
 
@@ -64,6 +64,30 @@ class WorkerListView(SearchMixin, ListView):
 			)
 
 		return queryset
+
+
+class WorkerCreateView(CreateView):
+	model = get_user_model()
+	form_class = WorkerCreateForm
+	template_name = "pages/worker_form.html"
+
+	def dispatch(self, request, *args, **kwargs):
+		if request.user.is_authenticated:
+			return redirect("task_manager:index")
+
+		return super().dispatch(request, *args, **kwargs)
+
+	def get_success_url(self):
+		return reverse_lazy(
+			"task_manager:worker_detail", kwargs={"pk": self.object.pk}
+		)
+
+	def form_valid(self, form):
+		response = super().form_valid(form)
+		user = form.save()
+		login(self.request, user)
+
+		return response
 
 
 class WorkerDetailView(LoginRequiredMixin, DetailView):
