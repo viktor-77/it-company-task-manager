@@ -57,7 +57,7 @@
 									{% endif %}
 								</p>
 								{% if user.is_superuser or user.pk|stringformat:"s" in request.path %}
-									<a href="#">
+									<a href="{% url "task_manager:worker_update" worker.pk %}?next={{ request.path }}">
 										<div
 											class="btn bg-gradient-primary btn-icon m-0"
 											type="button">
