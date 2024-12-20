@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth import get_user_model
 
 from task_manager.models import Task
 
@@ -52,3 +53,51 @@ class TaskForm(forms.ModelForm):
 			"task_type": forms.RadioSelect(),
 			"assignees": forms.SelectMultiple(attrs={"class": "form-select"})
 		}
+
+
+class WorkerBaseForm(forms.ModelForm):
+	username = forms.CharField(
+		widget=forms.TextInput(
+			attrs={
+				"class": "form-control",
+				"placeholder": "Enter your username",
+				"autocomplete": "new-username"
+			}
+		),
+		min_length=5,
+	)
+	first_name = forms.CharField(
+		widget=forms.TextInput(
+			attrs={
+				"class": "form-control",
+				"placeholder": "Enter your first name",
+			}
+		),
+		min_length=5,
+	)
+	last_name = forms.CharField(
+		widget=forms.TextInput(
+			attrs={
+				"class": "form-control",
+				"placeholder": "Enter your last name",
+			}
+		),
+		min_length=5,
+	)
+	email = forms.EmailField(
+		widget=forms.EmailInput(
+			attrs={
+				"class": "form-control",
+				"placeholder": "Enter your email",
+			}
+		),
+	)
+
+	class Meta:
+		model = get_user_model()
+		fields = (
+			"username",
+			"first_name",
+			"last_name",
+			"email",
+		)
