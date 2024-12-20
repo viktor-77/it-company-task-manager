@@ -8,8 +8,14 @@ from django.db.models import Count, Prefetch, Q
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
-from django.views.generic import DeleteView, DetailView, ListView
+from django.views.generic import (
+	DeleteView,
+	DetailView,
+	ListView,
+	CreateView,
+)
 
+from task_manager.forms import TaskForm
 from task_manager.mixins import PreviousPageMixin, SearchMixin
 from task_manager.models import Task
 
@@ -123,6 +129,17 @@ class TaskListView(SearchMixin, ListView):
 		context["today"] = date.today()
 
 		return context
+
+
+class TaskCreateView(LoginRequiredMixin, CreateView):
+	model = Task
+	form_class = TaskForm
+	template_name = "pages/task_form.html"
+
+	def get_success_url(self):
+		return reverse_lazy(
+			"task_manager:task_detail", kwargs={"pk": self.object.pk}
+		)
 
 
 class TaskDetailView(LoginRequiredMixin, DetailView):
