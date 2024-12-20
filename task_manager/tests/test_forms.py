@@ -1,11 +1,16 @@
 from django.test import SimpleTestCase, TestCase
 
 from task_manager.forms import (
-	SearchForm, TaskForm, WorkerBaseForm,
+	SearchForm,
+	TaskForm,
+	WorkerBaseForm,
+	WorkerCreateForm,
 )
-from task_manager.models import Task
+from task_manager.models import Task, Worker
 from task_manager.tests.utils import (
-	create_task_type, create_worker,
+	create_position,
+	create_task_type,
+	create_worker,
 	get_actual_deadline,
 	get_str_over_length_limit,
 )
@@ -120,3 +125,82 @@ class WorkerBaseFormTests(TestCase):
 		self.assertIn("username", form.errors)
 		self.assertIn("first_name", form.errors)
 		self.assertIn("last_name", form.errors)
+
+
+class WorkerCreateFormTest(TestCase):
+	def setUp(self) -> None:
+		self.form_data = {
+			"username": "test-username",
+			"first_name": "first-name",
+			"last_name": "last-name",
+			"email": "test.user@example.com",
+			"position": create_position().pk,
+			"password1": "TestPassword123!",
+			"password2": "TestPassword123!",
+		}
+
+	def test_valid_form(self) -> None:
+		form = WorkerCreateForm(data=self.form_data)
+
+		self.assertTrue(form.is_valid())
+		worker = form.save()
+
+		self.assertTrue(Worker.objects.filter(pk=worker.pk).exists())
+
+	def test_required_fields(self) -> None:
+		form = WorkerCreateForm(data={})
+
+		self.assertFalse(form.is_valid())
+		for field in self.form_data:
+			self.assertIn(field, form.errors)
+
+	def test_password_mismatch_validation(self) -> None:
+		self.form_data["password2"] = self.form_data["password2"][-1]
+		form = WorkerCreateForm(data=self.form_data)
+
+		self.assertFalse(form.is_valid())
+		self.assertIn("password2", form.errors)
+
+	def test_short_password__validation(self) -> None:
+		short_password = "x" * 7
+		self.form_data["password1"] = short_password
+		self.form_data["password2"] = short_password
+		form = WorkerCreateForm(data=self.form_data)
+
+		self.assertFalse(form.is_valid())
+		self.assertIn(
+			"This password is too short. It must contain at least 8 characters.",
+			form.errors["password2"]
+		)
+
+	def test_common_password_validation(self) -> None:
+		very_common_password = "password"
+		self.form_data["password1"] = very_common_password
+		self.form_data["password2"] = very_common_password
+		form = WorkerCreateForm(data=self.form_data)
+
+		self.assertFalse(form.is_valid())
+		self.assertIn("This password is too common.", form.errors["password2"])
+
+	def test_numeric_password__validation(self) -> None:
+		numeric_password = "123456789"
+		self.form_data["password1"] = numeric_password
+		self.form_data["password2"] = numeric_password
+		form = WorkerCreateForm(data=self.form_data)
+
+		self.assertFalse(form.is_valid())
+		self.assertIn(
+			"This password is entirely numeric.", form.errors["password2"]
+		)
+
+	def test_similar_attribute_password_validation(self) -> None:
+		password_similar_to_username = "test-username"
+		self.form_data["password1"] = password_similar_to_username
+		self.form_data["password2"] = password_similar_to_username
+		form = WorkerCreateForm(data=self.form_data)
+
+		self.assertFalse(form.is_valid())
+		self.assertIn(
+			"The password is too similar to the username.",
+			form.errors["password2"]
+		)
