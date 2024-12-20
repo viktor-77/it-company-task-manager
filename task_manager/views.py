@@ -9,10 +9,11 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import (
-	DeleteView,
 	DetailView,
 	ListView,
 	CreateView,
+	UpdateView,
+	DeleteView,
 )
 
 from task_manager.forms import TaskForm
@@ -158,6 +159,31 @@ class TaskDetailView(LoginRequiredMixin, DetailView):
 		).exists()
 
 		return context
+
+
+class TaskUpdateView(UpdateView):
+	model = Task
+	form_class = TaskForm
+	template_name = "pages/task_form.html"
+
+	def dispatch(self, request, *args, **kwargs):
+		task = self.get_object()
+		is_user_assigned = task.assignees.filter(pk=request.user.pk).exists()
+
+		if not (request.user.is_superuser or is_user_assigned):
+			raise PermissionDenied(
+				"You are not allowed to edit this task."
+			)
+
+		return super().dispatch(request, *args, **kwargs)
+
+	def get_success_url(self) -> str:
+		if next_page := self.request.GET.get("next"):
+			return next_page
+
+		return reverse_lazy(
+			"task_manager:task_detail", kwargs={"pk": self.object.pk}
+		)
 
 
 class TaskDeleteView(PreviousPageMixin, DeleteView):
