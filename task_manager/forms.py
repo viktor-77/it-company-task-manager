@@ -1,6 +1,8 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 
 from task_manager.models import Position, Task
 
@@ -133,3 +135,29 @@ class WorkerCreateForm(WorkerBaseForm, UserCreationForm):
 		fields = WorkerBaseForm.Meta.fields + (
 			"position", "password1", "password2",
 		)
+
+
+class WorkerUpdateForm(WorkerBaseForm):
+	password = forms.CharField(
+		label="Password",
+		required=False,
+		widget=forms.PasswordInput(
+			attrs={
+				"class": "form-control",
+				"placeholder": "Confirm your password",
+				"autocomplete": "new-password",
+			}
+		),
+	)
+
+	class Meta(WorkerBaseForm.Meta):
+		fields = WorkerBaseForm.Meta.fields + ("password",)
+
+	def clean_password(self):
+		if password := self.cleaned_data.get("password"):
+			try:
+				validate_password(password, self.instance)
+			except ValidationError as error:
+				self.add_error("password", error)
+
+		return password
