@@ -5,9 +5,15 @@ from django.test import TestCase
 from django.urls import reverse
 
 from task_manager.models import Task
-from task_manager.tests.utils import create_task, create_worker
+from task_manager.tests.utils import (
+	create_task,
+	create_task_type,
+	create_worker,
+	get_actual_deadline,
+)
 
 TASK_LIST_URL = "task_manager:task_list"
+TASK_CREATE_URL = "task_manager:task_create"
 TASK_DETAIL_URL = "task_manager:task_detail"
 TASK_DELETE_URL = "task_manager:task_delete"
 
@@ -85,6 +91,64 @@ class TaskListViewTest(TestCase):
 		response = self.client.get(reverse(TASK_LIST_URL))
 
 		self.assertEqual(response.context["today"], date.today())
+
+
+class TaskCreateViewTest(TestCase):
+	@classmethod
+	def setUpTestData(cls) -> None:
+		cls.task_type = create_task_type()
+		cls.user = create_worker()
+		cls.form_data = {
+			"name": "Test Task",
+			"description": "Test description",
+			"deadline": get_actual_deadline(),
+			"is_completed": False,
+			"priority": 1,
+			"task_type": cls.task_type.pk,
+			"assignees": [cls.user.pk]
+		}
+
+	def test_task_create_view_login_required(self) -> None:
+		response = self.client.post(reverse(TASK_CREATE_URL))
+
+		self.assertEqual(response.status_code, 302)
+		self.assertIn(LOGIN_URL, response.url)
+
+	def test_task_create_view_accessible_for_authenticated_users(self):
+		self.client.force_login(self.user)
+		response = self.client.get(reverse(TASK_CREATE_URL))
+
+		self.assertEqual(response.status_code, 200)
+		self.assertTemplateUsed(response, "pages/task_form.html")
+
+	def test_task_create_view_successful_creation(self):
+		self.client.force_login(self.user)
+		response = self.client.post(
+			reverse(TASK_CREATE_URL), data=self.form_data
+		)
+
+		self.assertTrue(
+			Task.objects.filter(name=self.form_data["name"]).exists()
+		)
+		created_task = Task.objects.get(name=self.form_data["name"])
+		self.assertEqual(
+			created_task.description, self.form_data["description"]
+		)
+		self.assertEqual(created_task.deadline, self.form_data["deadline"])
+		self.assertEqual(created_task.is_completed, False)
+		self.assertEqual(created_task.priority, self.form_data["priority"])
+		self.assertIn(self.user, created_task.assignees.all())
+		self.assertRedirects(
+			response, reverse(TASK_DETAIL_URL, kwargs={"pk": created_task.pk})
+		)
+
+	def test_task_create_view_invalid_form(self):
+		self.client.force_login(self.user)
+		response = self.client.post(
+			reverse(TASK_CREATE_URL), data={}
+		)
+
+		self.assertTrue(response.context["form"].errors)
 
 
 class TaskDetailViewTest(TestCase):
