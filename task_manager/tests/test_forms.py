@@ -1,6 +1,8 @@
 from django.test import SimpleTestCase, TestCase
 
-from task_manager.forms import SearchForm, TaskForm
+from task_manager.forms import (
+	SearchForm, TaskForm, WorkerBaseForm,
+)
 from task_manager.models import Task
 from task_manager.tests.utils import (
 	create_task_type, create_worker,
@@ -82,3 +84,39 @@ class TaskFormTest(TestCase):
 
 		self.assertTrue(Task.objects.filter(pk=task.pk).exists())
 		self.assertFalse(task.is_completed)
+
+
+class WorkerBaseFormTests(TestCase):
+	def setUp(self) -> None:
+		self.form_data = {
+			"username": "test-username",
+			"first_name": "first-name",
+			"last_name": "last-name",
+			"email": "test.user@example.com",
+		}
+
+	def test_valid_form(self) -> None:
+		form = WorkerBaseForm(data=self.form_data)
+
+		self.assertTrue(form.is_valid())
+
+	def test_required_fields_validation(self) -> None:
+		form = WorkerBaseForm(data={})
+
+		self.assertFalse(form.is_valid())
+		for field in self.form_data:
+			self.assertIn(field, form.errors)
+
+	def test_min_length_name_fields_validation(self) -> None:
+		form = WorkerBaseForm(
+			data={
+				"username": "test",
+				"first_name": "test",
+				"last_name": "test",
+			}
+		)
+
+		self.assertFalse(form.is_valid())
+		self.assertIn("username", form.errors)
+		self.assertIn("first_name", form.errors)
+		self.assertIn("last_name", form.errors)
