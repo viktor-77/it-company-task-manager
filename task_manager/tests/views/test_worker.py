@@ -6,10 +6,11 @@ from django.test import TestCase
 from django.urls import reverse
 
 from task_manager.tests.utils import (
-	create_task, create_worker,
+	create_position, create_task, create_worker,
 )
 
 WORKER_LIST_URL = "task_manager:worker_list"
+WORKER_CREATE_URL = "task_manager:worker_create"
 WORKER_DETAIL_URL = "task_manager:worker_detail"
 WORKER_DELETE_URL = "task_manager:worker_delete"
 
@@ -86,6 +87,72 @@ class WorkerListViewTest(TestCase):
 		self.assertEqual(
 			response.context["search_form"].initial["query"],
 			self.worker1.username
+		)
+
+
+class WorkerCreateViewTest(TestCase):
+	@classmethod
+	def setUpTestData(cls) -> None:
+		cls.user = create_worker()
+		cls.position = create_position()
+		cls.form_data = {
+			"username": "test-username",
+			"password1": "securepassword123",
+			"password2": "securepassword123",
+			"first_name": "test-first_name",
+			"last_name": "test-last_name",
+			"email": "test@email.com",
+			"position": cls.position.pk,
+		}
+
+	def test_worker_create_view_redirects_authenticated_user_to_index_page(
+		self
+	):
+		self.client.force_login(self.user)
+		response = self.client.get(reverse(WORKER_CREATE_URL))
+
+		self.assertEqual(response.status_code, 302)
+		self.assertRedirects(response, reverse("task_manager:index"))
+
+	def test_worker_create_view_accessible_for_unauthenticated_users(self):
+		response = self.client.get(reverse(WORKER_CREATE_URL))
+
+		self.assertEqual(response.status_code, 200)
+		self.assertTemplateUsed(response, "pages/worker_form.html")
+
+	def test_worker_create_view_successful_creation(self):
+		response = self.client.post(
+			reverse(WORKER_CREATE_URL), data=self.form_data
+		)
+
+		self.assertTrue(
+			get_user_model().objects.filter(
+				username=self.form_data["username"]
+			).exists()
+		)
+		user = get_user_model().objects.get(
+			username=self.form_data["username"]
+		)
+		self.assertRedirects(
+			response,
+			reverse(WORKER_DETAIL_URL, kwargs={"pk": user.pk})
+		)
+		self.assertTrue(response.wsgi_request.user.is_authenticated)
+		self.assertEqual(response.wsgi_request.user.pk, user.pk)
+
+	def test_worker_create_view_invalid_form(self):
+		self.form_data["password2"] = self.form_data["password2"][-1]
+		response = self.client.post(
+			reverse(WORKER_CREATE_URL), data=self.form_data
+		)
+
+		self.assertEqual(response.status_code, 200)
+		self.assertTrue(response.context["form"].errors)
+		self.assertIn("password2", response.context["form"].errors)
+		self.assertFalse(
+			get_user_model().objects.filter(
+				username=self.form_data["username"]
+			).exists()
 		)
 
 
