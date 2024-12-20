@@ -16,7 +16,7 @@ from django.views.generic import (
 	DeleteView,
 )
 
-from task_manager.forms import TaskForm, WorkerCreateForm
+from task_manager.forms import TaskForm, WorkerCreateForm, WorkerUpdateForm
 from task_manager.mixins import PreviousPageMixin, SearchMixin
 from task_manager.models import Task
 
@@ -118,6 +118,40 @@ class WorkerDetailView(LoginRequiredMixin, DetailView):
 		context["today"] = date.today()
 
 		return context
+
+
+class WorkerUpdateView(UpdateView):
+	model = get_user_model()
+	form_class = WorkerUpdateForm
+	template_name = "pages/worker_form.html"
+
+	def dispatch(self, request, *args, **kwargs):
+		worker = self.get_object()
+		if not request.user.is_superuser and request.user.pk != worker.pk:
+			raise PermissionDenied("You are not allowed to edit this user.")
+
+		return super().dispatch(request, *args, **kwargs)
+
+	def get_success_url(self) -> str:
+		if next_page := self.request.GET.get("next"):
+			return next_page
+
+		return reverse_lazy(
+			"task_manager:worker_detail", kwargs={"pk": self.get_object().pk}
+		)
+
+	def form_valid(self, form):
+		worker = form.save(commit=False)
+
+		if password := form.cleaned_data["password"]:
+			worker.set_password(password)
+			if worker.pk == self.request.user.pk:
+				login(self.request, worker)
+		else:
+			del worker.password
+		worker.save()
+
+		return super().form_valid(form)
 
 
 class WorkerDeleteView(PreviousPageMixin, DeleteView):
