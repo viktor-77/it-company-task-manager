@@ -1,7 +1,8 @@
 from django import forms
 from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import UserCreationForm
 
-from task_manager.models import Task
+from task_manager.models import Position, Task
 
 
 class SearchForm(forms.Form):
@@ -100,4 +101,35 @@ class WorkerBaseForm(forms.ModelForm):
 			"first_name",
 			"last_name",
 			"email",
+		)
+
+
+class WorkerCreateForm(WorkerBaseForm, UserCreationForm):
+	position = forms.ModelChoiceField(
+		queryset=Position.objects, widget=forms.RadioSelect,
+	)
+	password1 = forms.CharField(
+		label="Password",
+		widget=forms.PasswordInput(
+			attrs={
+				"class": "form-control",
+				"placeholder": "Enter your password",
+				"autocomplete": "new-password",
+			}
+		),
+	)
+	password2 = forms.CharField(
+		label="Password confirmation",
+		widget=forms.PasswordInput(
+			attrs={
+				"class": "form-control",
+				"placeholder": "Confirm your password",
+				"autocomplete": "new-password",
+			}
+		),
+	)
+
+	class Meta(WorkerBaseForm.Meta, UserCreationForm.Meta):
+		fields = WorkerBaseForm.Meta.fields + (
+			"position", "password1", "password2",
 		)
