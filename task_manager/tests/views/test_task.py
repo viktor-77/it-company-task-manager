@@ -15,6 +15,7 @@ from task_manager.tests.utils import (
 TASK_LIST_URL = "task_manager:task_list"
 TASK_CREATE_URL = "task_manager:task_create"
 TASK_DETAIL_URL = "task_manager:task_detail"
+TASK_UPDATE_URL = "task_manager:task_update"
 TASK_DELETE_URL = "task_manager:task_delete"
 
 
@@ -195,6 +196,89 @@ class TaskDetailViewTest(TestCase):
 		self.assertEqual(response.status_code, 200)
 		self.assertEqual(response.context["today"], date.today())
 		self.assertFalse(response.context["is_assigned"])
+
+
+class TaskUpdateViewTest(TestCase):
+	@classmethod
+	def setUpTestData(cls):
+		cls.task_type = create_task_type()
+		cls.superuser = create_worker(username="admin", is_superuser=True)
+		cls.assigned_user = create_worker(username="assigned_user")
+		cls.unassigned_user = create_worker(username="unassigned_user")
+		cls.task = create_task()
+		cls.task.assignees.add(cls.assigned_user)
+		cls.form_data = {
+			"name": "Updated Task",
+			"description": "Updated description",
+			"deadline": cls.task.deadline,
+			"is_completed": cls.task.is_completed,
+			"priority": cls.task.priority,
+			"task_type": cls.task.task_type.pk,
+			"assignees": [cls.assigned_user.pk]
+		}
+
+	def test_task_update_view_not_accessible_for_unauthenticated_users(
+		self
+	) -> None:
+		response = self.client.get(
+			reverse(TASK_UPDATE_URL, args=[self.task.pk])
+		)
+
+		self.assertEqual(response.status_code, 403)
+
+	def test_task_update_view_not_accessible_for_unassigned_users(self):
+		self.client.force_login(self.unassigned_user)
+		response = self.client.get(
+			reverse(TASK_UPDATE_URL, args=[self.task.pk])
+		)
+
+		self.assertEqual(response.status_code, 403)
+
+	def test_task_update_view_accessible_for_assigned_users(self) -> None:
+		self.client.force_login(self.assigned_user)
+		response = self.client.get(
+			reverse(TASK_UPDATE_URL, args=[self.task.pk])
+		)
+
+		self.assertEqual(response.status_code, 200)
+		self.assertTemplateUsed(response, "pages/task_form.html")
+
+	def test_task_update_view_accessible_for_superusers(self) -> None:
+		self.client.force_login(self.superuser)
+		response = self.client.get(
+			reverse(TASK_UPDATE_URL, args=[self.task.pk])
+		)
+
+		self.assertEqual(response.status_code, 200)
+		self.assertTemplateUsed(response, "pages/task_form.html")
+
+	def test_task_update_view_successful_update(self):
+		self.client.force_login(self.assigned_user)
+		response = self.client.post(
+			reverse(TASK_UPDATE_URL, args=[self.task.pk]), data=self.form_data
+		)
+		self.task.refresh_from_db()
+
+		self.assertEqual(self.task.name, self.form_data["name"])
+		self.assertTrue(
+			Task.objects.filter(name=self.form_data["name"]).exists()
+		)
+		self.assertRedirects(
+			response,
+			reverse("task_manager:task_detail", kwargs={"pk": self.task.pk})
+		)
+
+	def test_task_update_view_invalid_form(self):
+		self.client.force_login(self.assigned_user)
+		form_data = self.form_data.copy()
+		form_data["name"] = ""
+		response = self.client.post(
+			reverse(TASK_UPDATE_URL, args=[self.task.pk]), data=form_data
+		)
+
+		self.assertEqual(response.status_code, 200)
+		self.assertTrue(response.context["form"].errors)
+		self.assertIn("name", response.context["form"].errors)
 
 
 class TaskDeleteViewTest(TestCase):
