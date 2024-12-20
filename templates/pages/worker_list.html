@@ -66,7 +66,7 @@
 									<td>{{ worker.position }}</td>
 									{% if user.is_superuser %}
 										<td>
-											<a href="#?next={{ request.path }}"
+											<a href="{% url "task_manager:worker_update" worker.pk %}?next={{ request.path }}"
 												 class="text-info text-gradient">
 												<i
 													class="fas fa-edit me-2"
