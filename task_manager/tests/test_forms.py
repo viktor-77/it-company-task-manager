@@ -5,6 +5,7 @@ from task_manager.forms import (
 	TaskForm,
 	WorkerBaseForm,
 	WorkerCreateForm,
+	WorkerUpdateForm,
 )
 from task_manager.models import Task, Worker
 from task_manager.tests.utils import (
@@ -203,4 +204,75 @@ class WorkerCreateFormTest(TestCase):
 		self.assertIn(
 			"The password is too similar to the username.",
 			form.errors["password2"]
+		)
+
+
+class WorkerUpdateFormTest(TestCase):
+	def setUp(self) -> None:
+		self.form_data = {
+			"username": "test-username",
+			"first_name": "first-name",
+			"last_name": "last-name",
+			"email": "test.user@example.com",
+			"password": "TestPassword123!",
+		}
+
+	def test_valid_form(self) -> None:
+		form = WorkerUpdateForm(data=self.form_data)
+
+		self.assertTrue(form.is_valid())
+
+	def test_valid_form_without_password(self) -> None:
+		self.form_data.pop("password")
+		form = WorkerUpdateForm(data=self.form_data)
+
+		self.assertTrue(form.is_valid())
+
+	def test_valid_form_empty_password(self) -> None:
+		self.form_data["password"] = ""
+		form = WorkerUpdateForm(data=self.form_data)
+
+		self.assertTrue(form.is_valid())
+
+	def test_required_fields(self) -> None:
+		form = WorkerUpdateForm(data={})
+
+		self.assertFalse(form.is_valid())
+		for field in ("username", "first_name", "last_name", "email",):
+			self.assertIn(field, form.errors)
+
+	def test_short_password__validation(self) -> None:
+		self.form_data["password"] = "x" * 7
+		form = WorkerUpdateForm(data=self.form_data)
+
+		self.assertFalse(form.is_valid())
+		self.assertIn(
+			"This password is too short. It must contain at least 8 characters.",
+			form.errors["password"]
+		)
+
+	def test_common_password_validation(self) -> None:
+		self.form_data["password"] = "password"
+		form = WorkerUpdateForm(data=self.form_data)
+
+		self.assertFalse(form.is_valid())
+		self.assertIn("This password is too common.", form.errors["password"])
+
+	def test_numeric_password__validation(self) -> None:
+		self.form_data["password"] = "123456789"
+		form = WorkerUpdateForm(data=self.form_data)
+
+		self.assertFalse(form.is_valid())
+		self.assertIn(
+			"This password is entirely numeric.", form.errors["password"]
+		)
+
+	def test_similar_attribute_password_validation(self) -> None:
+		self.form_data["password"] = "test-username"
+		form = WorkerUpdateForm(data=self.form_data, instance=create_worker())
+
+		self.assertFalse(form.is_valid())
+		self.assertIn(
+			"The password is too similar to the username.",
+			form.errors["password"]
 		)
