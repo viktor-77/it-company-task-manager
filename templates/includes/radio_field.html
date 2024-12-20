@@ -1,0 +1,27 @@
+{# Required variables: field (form field object), initial (initial value), field_validated_value (validated user input) #}
+
+<div class="text-primary mb-2">
+	{{ field.label }}
+</div>
+
+{% for value, label in field.field.choices %}
+	<div class="form-check">
+		<input
+			class="form-check-input"
+			type="radio"
+			id="id_{{ field.name }}_{{ value }}"
+			name="{{ field.name }}"
+			value="{{ value }}"
+			{% if initial == value or field_validated_value == value|stringformat:"s" %}
+			checked
+			{% endif %}>
+		<label class="form-check-label"
+					 for="id_{{ field.name }}_{{ value }}">
+			{{ label }}
+		</label>
+	</div>
+{% endfor %}
+
+<div class="text-danger">
+	{{ field.errors }}
+</div>
