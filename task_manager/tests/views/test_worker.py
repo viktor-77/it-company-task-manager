@@ -12,6 +12,7 @@ from task_manager.tests.utils import (
 WORKER_LIST_URL = "task_manager:worker_list"
 WORKER_CREATE_URL = "task_manager:worker_create"
 WORKER_DETAIL_URL = "task_manager:worker_detail"
+WORKER_UPDATE_URL = "task_manager:worker_update"
 WORKER_DELETE_URL = "task_manager:worker_delete"
 
 
@@ -213,6 +214,132 @@ class WorkerDetailViewTest(TestCase):
 			[self.resolved_task1, self.resolved_task2]
 		)
 		self.assertEqual(response.context["today"], date.today())
+
+
+class WorkerUpdateViewTest(TestCase):
+	@classmethod
+	def setUpTestData(cls):
+		cls.superuser = create_worker(username="admin", is_superuser=True)
+		cls.user = create_worker(
+			username="user1",
+			first_name="test_first_name",
+			last_name="test_last_name",
+			email="user@example.com",
+		)
+		cls.user2 = create_worker(username="user2")
+		cls.form_data = {
+			"username": "Updated-username",
+			"first_name": "Updated-first_name",
+			"last_name": "Updated-last_name",
+			"email": "updated_user@example.com",
+		}
+
+	def test_worker_update_view_not_accessible_for_unauthenticated_users(
+		self
+	) -> None:
+		response = self.client.get(
+			reverse(WORKER_UPDATE_URL, args=[self.user.pk])
+		)
+
+		self.assertEqual(response.status_code, 403)
+
+	def test_worker_update_view_not_accessible_for_other_users(self):
+		self.client.force_login(self.user)
+		response = self.client.get(
+			reverse(WORKER_UPDATE_URL, args=[self.user2.pk])
+		)
+
+		self.assertEqual(response.status_code, 403)
+
+	def test_worker_update_view_accessible_for_self_user(self) -> None:
+		self.client.force_login(self.user)
+		response = self.client.get(
+			reverse(WORKER_UPDATE_URL, args=[self.user.pk])
+		)
+
+		self.assertEqual(response.status_code, 200)
+		self.assertTemplateUsed(response, "pages/worker_form.html")
+
+	def test_worker_update_view_accessible_for_superuser(self) -> None:
+		self.client.force_login(self.superuser)
+		response = self.client.get(
+			reverse(WORKER_UPDATE_URL, args=[self.user2.pk])
+		)
+
+		self.assertEqual(response.status_code, 200)
+		self.assertTemplateUsed(response, "pages/worker_form.html")
+
+	def test_worker_update_view_successful_update(self):
+		self.client.force_login(self.user)
+		response = self.client.post(
+			reverse(WORKER_UPDATE_URL, args=[self.user.pk]),
+			data=self.form_data,
+		)
+		self.user.refresh_from_db()
+
+		self.assertEqual(self.user.username, self.form_data["username"])
+		self.assertEqual(self.user.first_name, self.form_data["first_name"])
+		self.assertEqual(self.user.last_name, self.form_data["last_name"])
+		self.assertEqual(self.user.email, self.form_data["email"])
+		self.assertRedirects(
+			response, reverse(WORKER_DETAIL_URL, kwargs={"pk": self.user.pk})
+		)
+
+	def test_worker_update_view_successful_password_change(self):
+		self.client.force_login(self.user)
+		form_data = {
+			"username": self.user.username,
+			"first_name": self.user.first_name,
+			"last_name": self.user.last_name,
+			"email": self.user.email,
+			"password": "new_secure_password123",
+		}
+		response = self.client.post(
+			reverse(WORKER_UPDATE_URL, args=[self.user.pk]),
+			data=form_data,
+		)
+		self.user.refresh_from_db()
+
+		self.assertTrue(self.user.check_password("new_secure_password123"))
+		self.assertEqual(self.user.username, form_data["username"])
+		self.assertEqual(self.user.first_name, form_data["first_name"])
+		self.assertEqual(self.user.last_name, form_data["last_name"])
+		self.assertEqual(self.user.email, form_data["email"])
+
+		self.assertRedirects(
+			response,
+			reverse("task_manager:worker_detail", kwargs={"pk": self.user.pk}),
+		)
+		self.assertTrue(response.wsgi_request.user.is_authenticated)
+		self.assertEqual(response.wsgi_request.user.pk, self.user.pk)
+
+	def test_superuser_successful_change_user_password(self):
+		self.client.force_login(self.superuser)
+		self.form_data["password"] = "new_secure_password123"
+		response = self.client.post(
+			reverse(WORKER_UPDATE_URL, args=[self.user.pk]),
+			data=self.form_data,
+		)
+		self.user.refresh_from_db()
+
+		self.assertTrue(self.user.check_password("new_secure_password123"))
+		self.assertRedirects(
+			response,
+			reverse("task_manager:worker_detail", kwargs={"pk": self.user.pk}),
+		)
+		self.assertTrue(response.wsgi_request.user.is_authenticated)
+		self.assertEqual(response.wsgi_request.user.pk, self.superuser.pk)
+
+	def test_worker_update_view_invalid_form(self):
+		self.client.force_login(self.user)
+		response = self.client.post(
+			reverse(WORKER_UPDATE_URL, args=[self.user.pk]), data={}
+		)
+
+		self.assertEqual(response.status_code, 200)
+		self.assertTrue(response.context["form"].errors)
+		for field in self.form_data:
+			self.assertIn(field, response.context["form"].errors)
 
 
 class WorkerDeleteViewTest(TestCase):
