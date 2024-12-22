@@ -1,0 +1,35 @@
+<div class="col-md-6">
+	<div class="card shadow-sm">
+		<div class="card-header bg-gradient-{{ task.is_completed|yesno:"success,faded-dark" }} text-white d-flex align-items-center justify-content-between border border-1 ">
+			<h5 class="card-title text-uppercase mb-0">{{ task }}</h5>
+			{% if user.is_superuser or user.pk|stringformat:"s" in request.path %}
+				<a href="{% url "task_manager:task_update" task.pk %}?next={{ request.path }}">
+					<i
+						class="fas fa-edit me-2 border border-1 p-3 card"
+						aria-hidden="true"></i>
+				</a>
+			{% endif %}
+		</div>
+		<div class="card-body">
+			<div class="container border-start border-primary border-2">
+				<p>
+					<strong>Type:</strong>
+					{{ task.task_type }}</p>
+				<p>
+					{% include "includes/task_priority_indicator.html" %}
+				</p>
+				<p {% include "includes/deadline_overdue_indicator.html" %}>
+					<strong>Deadline:</strong>
+					<i>{{ task.deadline }}</i>
+				</p>
+			</div>
+			<div class="text-center mt-4">
+				<a
+					href="{% url "task_manager:task_detail" task.pk %}"
+					class="btn btn-outline-primary btn-sm">
+					View Task Details
+				</a>
+			</div>
+		</div>
+	</div>
+</div>

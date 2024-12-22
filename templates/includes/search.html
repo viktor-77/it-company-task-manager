@@ -1,0 +1,28 @@
+<!-- Search -->
+<div class="row text-center py-2 mt-3">
+	<div class="col-6 mx-auto">
+		<div class="input-group mb-5">
+			<form action=""
+						method="get"
+						class="w-80 m-auto d-flex align-items-center">
+				{{ search_form.query }}
+				<button type="submit"
+								class="btn btn-primary m-0 ms-3"
+								data-bs-toggle="tooltip"
+								data-bs-placement="top"
+								title="Search">
+					<i class="fa-solid fa-magnifying-glass"></i>
+				</button>
+				{% if request.GET.query %}
+					<a href="{% querystring query='' page=None %}"
+						 data-bs-toggle="tooltip"
+						 data-bs-placement="top"
+						 title="Reset"
+						 class="btn btn-danger m-0 ms-3">
+						<i class="fa-solid fa-xmark"></i>
+					</a>
+				{% endif %}
+			</form>
+		</div>
+	</div>
+</div>

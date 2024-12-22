@@ -1,0 +1,27 @@
+{% extends 'layouts/base_sections.html' %}
+{% load static %}
+{% block body %} class="index-page bg-gray-200 vh-100 d-flex flex-column" {% endblock body %}
+
+{% block content %}
+	<header class="flex-grow-1 d-flex align-items-center justify-content-center position-relative">
+		<img class="position-absolute top-0 end-0 w-70 h-100 z-index-0 d-none d-md-block border-radius-section border-top-end-radius-0 border-top-start-radius-0 border-bottom-end-radius-0"
+				 src="https://appsrv1-147a1.kxcdn.com/soft-ui-design-v1.0.1/img/curved-images/curved8.jpg"
+				 alt="Background Image">
+		<div class="container text-center position-relative z-index-1">
+			<div class="card d-flex justify-content-center p-4 shadow-lg w-50 m-auto border-radius-lg">
+				{% block heading %}{% endblock heading %}
+				<p class="text-muted mb-4">This action cannot be undone.</p>
+				<div class="d-flex justify-content-center align-items-center gap-3">
+					<a href="{{ previous_page }}"
+						 class="btn bg-gradient-info px-4 py-2 fw-bold">No
+					</a>
+					<form action=""
+								method="post">
+						{% csrf_token %}
+						<button class="btn bg-gradient-danger px-4 py-2 fw-bold">Yes</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</header>
+{% endblock content %}

@@ -1,0 +1,75 @@
+{% extends 'layouts/base_sections.html' %}
+{% load static %}
+{% block body %} class="sign-in-illustration" {% endblock body %}
+
+{% block header %}
+	{% include 'includes/navigation.html' %}
+{% endblock header %}
+
+{% block content %}
+	<section>
+		<div class="page-header min-vh-100">
+			<div class="container">
+				<div class="row">
+					<div class="col-xl-4 col-lg-5 col-md-7 d-flex flex-column mx-lg-0 mx-auto">
+						<div class="card card-plain mt-6">
+							<div class="card-header pb-0 text-left">
+								<h4 class="font-weight-bolder">{{ task|yesno:"Update,Create" }}
+									Task
+								</h4>
+							</div>
+							<div class="card-body">
+								<form method="post">
+									{% csrf_token %}
+
+									{% for field in form %}
+										{% if field.widget_type != "radioselect" and field.widget_type != "checkbox" %}
+											<div class="mb-4">
+												<div class="text-primary mb-2">
+													{{ field.label }}
+												</div>
+												{{ field }}
+												<div class="text-danger">
+													{{ field.errors }}
+												</div>
+											</div>
+										{% endif %}
+									{% endfor %}
+
+									{% if task %}
+										<div class="form-check form-switch ps-0 d-flex gap-6 align-items-center">
+											<div class="text-primary my-2">
+												{{ form.is_completed.label }}
+											</div>
+											{{ form.is_completed }}
+										</div>
+									{% endif %}
+
+									<div class="d-flex justify-content-between my-3">
+										<div class="row text-center py-2 w-100">
+											<div class="col-10 text-start">
+												{% include "includes/radio_field.html" with field=form.priority initial=form.initial.priority field_validated_value=form.data.priority %}
+											</div>
+										</div>
+										<div class="row text-center py-2 w-100">
+											<div class="col-10 text-start m-lg-auto">
+												{% include "includes/radio_field.html" with field=form.task_type initial=form.initial.task_type field_validated_value=form.data.task_type %}
+											</div>
+										</div>
+									</div>
+
+									<button type="submit"
+													class="btn btn-primary">Submit
+									</button>
+								</form>
+							</div>
+						</div>
+					</div>
+
+					{# side banner #}
+					{% include "includes/form_banner.html" %}
+				</div>
+			</div>
+		</div>
+	</section>
+{% endblock content %}

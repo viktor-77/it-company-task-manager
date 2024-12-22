@@ -1,0 +1,59 @@
+{% extends 'layouts/base_sections.html' %}
+{% load static %}
+{% block body %} class="sign-in-illustration" {% endblock body %}
+
+{% block header %}
+	{% include 'includes/navigation.html' %}
+{% endblock header %}
+
+{% block content %}
+	<section>
+		<div class="page-header min-vh-100">
+			<div class="container">
+				<div class="row">
+					<div class="col-xl-4 col-lg-5 col-md-7 d-flex flex-column mx-lg-0 mx-auto">
+						<div class="card card-plain mt-6">
+							<div class="card-header pb-0 text-left">
+								<h4 class="font-weight-bolder">
+									{{ worker|yesno:"Update,Create" }} account
+								</h4>
+							</div>
+							<div class="card-body">
+								<form action=""
+											method="post">
+									{% csrf_token %}
+
+									{% for field in form %}
+										{% if field.name != "position" %}
+											<div class="mb-4">
+												<div class="text-primary mb-2">
+													{{ field.label }}
+												</div>
+												{{ field }}
+												<div class="text-danger mt-2">
+													{{ field.errors }}
+												</div>
+											</div>
+										{% else %}
+											<div class="mb-4">
+												{% include "includes/radio_field.html" with field=form.position field_validated_value=form.data.position %}
+											</div>
+										{% endif %}
+									{% endfor %}
+
+									<button type="submit"
+													class="btn btn-primary">
+										Submit
+									</button>
+								</form>
+							</div>
+						</div>
+					</div>
+
+					{# side banner #}
+					{% include "includes/form_banner.html" %}
+				</div>
+			</div>
+		</div>
+	</section>
+{% endblock content %}
