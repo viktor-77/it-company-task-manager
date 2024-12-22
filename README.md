@@ -1,13 +1,39 @@
 # it-company-task-manager
 
+## Short Description
+
+This project is a task management system for IT companies, enabling users to
+create, assign, and manage tasks. It includes user profile editing, task
+management with specific permissions, and extended functionality for
+superusers, allowing them to manage all tasks and users.
+
+## Main Functionalities
+
+1. **User Registration and Authorization:**  
+   Users register in the app as regular users, granting them access to the
+   system's main features — creating and managing tasks.
+
+2. **User Profile Editing:**  
+   Users can edit their personal information on their profile page.
+
+3. **Task Management:**  
+   Each user can create tasks and assign them to any users. Only users who
+   are assigned to a specific task can edit or delete that task.
+
+4. **Superuser Functionality:**  
+   Superusers have extended capabilities:
+    - They can edit and delete any tasks and users.
+    - Additional buttons for quick access to editing or deleting records are
+      available on the task and user lists pages.
+
 ## Initialization
 
 1. **Clone the repository:**
-   - HTTPS
+    - HTTPS
     ```bash
     git clone https://github.com/viktor-77/it-company-task-manager.git
     ```
-   - SSH
+    - SSH
     ```bash
     git clone git@github.com:viktor-77/it-company-task-manager.git
     ```
