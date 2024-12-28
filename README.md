@@ -84,3 +84,10 @@ superusers, allowing them to manage all tasks and users.
     ```
     http://127.0.0.1:8000/
     ```
+
+## Demo deployed project
+
+https://it-company-task-manager-ry1b.onrender.com/
+
+* login:  user
+* password: user12345
