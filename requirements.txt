@@ -2,6 +2,11 @@ asgiref==3.8.1
 coverage==7.6.7
 Django==5.1.3
 django-allauth==65.2.0
+-e git+https://github.com/django-commons/django-debug-toolbar.git@a9ac5dc9371de1ecd2394affa2085a2a1427c7eb#egg=django_debug_toolbar
+gunicorn==23.0.0
+packaging==24.2
+psycopg2-binary==2.9.10
 python-dotenv==1.0.1
 sqlparse==0.5.2
 typing_extensions==4.12.2
+whitenoise==6.8.2
