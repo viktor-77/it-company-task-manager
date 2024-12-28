@@ -28,7 +28,7 @@ superusers, allowing them to manage all tasks and users.
 
 ## Initialization
 
-1. **Clone the repository:**
+1. **Clone & open the repository:**
     - HTTPS
     ```bash
     git clone https://github.com/viktor-77/it-company-task-manager.git
@@ -38,9 +38,13 @@ superusers, allowing them to manage all tasks and users.
     git clone git@github.com:viktor-77/it-company-task-manager.git
     ```
 
+   ```bash
+   cd it-company-task-manager
+   ```
+
 2. **Create a virtual environment:**
     ```bash
-    python -m venv venv
+    python3 -m venv venv
     ```
 
 3. **Activate the virtual environment:**
