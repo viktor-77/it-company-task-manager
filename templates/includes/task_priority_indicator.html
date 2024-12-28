@@ -1,0 +1,9 @@
+{% if task.priority == 4 %}
+	<span class="badge bg-gradient-danger">Urgent</span>
+{% elif task.priority == 3 %}
+	<span class="badge bg-gradient-warning">High</span>
+{% elif task.priority == 2 %}
+	<span class="badge bg-gradient-success">Medium</span>
+{% elif task.priority == 1 %}
+	<span class="badge bg-gradient-info">Low</span>
+{% endif %}
