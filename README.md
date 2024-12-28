@@ -70,12 +70,17 @@ superusers, allowing them to manage all tasks and users.
     python manage.py migrate
     ```
 
-7. **Run the server:**
+7. **Load initial data**
+    ```bash
+    python manage.py loaddata dump.json 
+    ```
+
+8. **Run the server:**
     ```bash
     python manage.py runserver
     ```
 
-8. **Open in your browser:**
+9. **Open in your browser:**
     ```
     http://127.0.0.1:8000/
     ```
