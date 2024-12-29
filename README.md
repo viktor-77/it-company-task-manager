@@ -62,7 +62,7 @@ superusers, allowing them to manage all tasks and users.
     pip install -r requirements.txt
     ```
 
-5. **Set up environment variables:**
+5. **(Optional) Set up environment variables:**
     - Copy `env.example` to `.env` and set correct values.
 
 6. **Apply database migrations:**
