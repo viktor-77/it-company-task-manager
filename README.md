@@ -105,3 +105,10 @@ https://it-company-task-manager-ry1b.onrender.com/
 
 * login:  user
 * password: user12345
+
+
+## Tech Stack
+- Python 3.12
+- Django 5.0
+- PostgreSQL (Prod)
+- SQLite (Loc/Tests)
