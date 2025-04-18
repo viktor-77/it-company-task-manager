@@ -1,11 +1,13 @@
-# it-company-task-manager
-
-## Short Description
+## task manager
 
 This project is a task management system for IT companies, enabling users to
 create, assign, and manage tasks. It includes user profile editing, task
 management with specific permissions, and extended functionality for
 superusers, allowing them to manage all tasks and users.
+
+![image](https://github.com/user-attachments/assets/ecb1c6f1-ba95-4b54-804f-6fc28197b7a3)
+
+
 
 ## Main Functionalities
 
@@ -13,20 +15,30 @@ superusers, allowing them to manage all tasks and users.
    Users register in the app as regular users, granting them access to the
    system's main features — creating and managing tasks.
 
-2. **User Profile Editing:**  
+   ![image](https://github.com/user-attachments/assets/59b27a42-9b2c-461b-8441-10d02e8dc51c)
+
+
+3. **User Profile Editing:**  
    Users can edit their personal information on their profile page.
 
-3. **Task Management:**  
+   ![image](https://github.com/user-attachments/assets/4aecb2b4-378f-4490-a0d3-63d2895df9eb)
+
+
+5. **Task Management:**  
    Each user can create tasks and assign them to any users. Only users who
    are assigned to a specific task can edit or delete that task.
 
-4. **Superuser Functionality:**  
+   ![image](https://github.com/user-attachments/assets/4b2dd8ed-8ce5-4e91-8dbf-23c5076dbc5e)
+
+
+7. **Superuser Functionality:**  
    Superusers have extended capabilities:
     - They can edit and delete any tasks and users.
     - Additional buttons for quick access to editing or deleting records are
       available on the task and user lists pages.
 
-## Initialization
+
+## Setup
 
 1. **Clone & open the repository:**
     - HTTPS
