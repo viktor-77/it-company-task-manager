@@ -1,4 +1,4 @@
-## task manager
+## Task Manager
 
 This project is a task management system for IT companies, enabling users to
 create, assign, and manage tasks. It includes user profile editing, task
@@ -9,7 +9,7 @@ superusers, allowing them to manage all tasks and users.
 
 
 
-## Main Functionalities
+## Functionalities
 
 1. **User Registration and Authorization:**  
    Users register in the app as regular users, granting them access to the
@@ -97,7 +97,7 @@ superusers, allowing them to manage all tasks and users.
     http://127.0.0.1:8000/
     ```
 
-## Demo deployed project
+##  Demo
 
 https://it-company-task-manager-ry1b.onrender.com/
 
