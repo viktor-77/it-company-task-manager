@@ -21,7 +21,9 @@ superusers, allowing them to manage all tasks and users.
 3. **User Profile Editing:**  
    Users can edit their personal information on their profile page.
 
-   ![image](https://github.com/user-attachments/assets/4aecb2b4-378f-4490-a0d3-63d2895df9eb)
+   ![image](https://github.com/user-attachments/assets/1fb88723-e5e6-4e83-b901-f64252788769)
+   ![image](https://github.com/user-attachments/assets/e0e8abe5-bac4-4946-93dd-b8692037fac4)
+
 
 
 5. **Task Management:**  
