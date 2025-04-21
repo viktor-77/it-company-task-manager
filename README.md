@@ -109,6 +109,7 @@ https://it-company-task-manager-ry1b.onrender.com/
 
 ## Tech Stack
 - Python 3.12
-- Django 5.0
+- Django 5
+- Bootstrap 5
 - PostgreSQL (Prod)
 - SQLite (Loc/Tests)
